@@ -1,9 +1,8 @@
 import random
 import math
-from typing import List
 
-VECTOR = List[float]
-MATRIX = List[VECTOR]
+VECTOR = list[float]
+MATRIX = list[VECTOR]
 
 def create_weight_matrix(rows: int, cols: int) -> MATRIX:
     """
