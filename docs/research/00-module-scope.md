@@ -1,19 +1,10 @@
 # Module Scope
 
-## Your Current Context
+## Repository Context
 
-This repository is being prepared for:
-
-- Studiengang: `Energieinformatik`
-- Fachsemester: `7`
-- Studienform: `dual praxisintegriert`
-- Modultyp: `Wahlmodul`
-
-This should take precedence over older assumptions from the previous repo layout.
+This repository is aligned with the HRW module handbook entry for **Neuroinformatik** in the `Mensch-Technik-Interaktion BPO2017` handbook.
 
 ## Official Anchor
-
-The most important official source found during research is the HRW module handbook entry for **Neuroinformatik** in the `Mensch-Technik-Interaktion BPO2017` handbook.
 
 Relevant points from pages 152-153:
 
@@ -82,5 +73,4 @@ Treat the project in three layers:
 Important note:
 
 - This handbook entry is the best official source found during this research pass.
-- The handbook entry is useful for the module scope, but your actual context is `Energieinformatik`, `7. Fachsemester`, `dual praxisintegriert`, `Wahlmodul`.
-- The semester/program allocation in handbooks can differ across study regulations, so your imported course material should be treated as the stronger practical guide for the current run of the module.
+- The semester/program allocation in handbooks can differ across study regulations, so the imported course material should be treated as the stronger practical guide for the current run of the module.
