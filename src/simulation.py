@@ -21,8 +21,8 @@ def run_xor_simulation():
 		[0.0],
 	]
 
-	xor_network = NeuralNetwork([2, 2, 1], learning_rate=0.5)
-	xor_target_loss = 0.065
+	xor_network = NeuralNetwork([2, 2, 1], learning_rate=1)
+	xor_target_loss = 0.0001
 	xor_report_every_epochs = 500
 	xor_epoch_losses = xor_network.train(
 		xor_training_inputs,
@@ -73,10 +73,10 @@ def run_sine_simulation():
 
 	sine_training_inputs, sine_training_targets = build_sine_training_data()
 
-	target_loss = 0.001
+	target_loss = 0.0001
 	report_every_epochs = 500
 
-	sine_network = NeuralNetwork([1, 8, 1], learning_rate=0.2)
+	sine_network = NeuralNetwork([1, 2, 1], learning_rate=0.275)
 	sine_epoch_losses = sine_network.train(
 		sine_training_inputs,
 		sine_training_targets,
