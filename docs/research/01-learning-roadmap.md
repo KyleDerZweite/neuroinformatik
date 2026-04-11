@@ -2,6 +2,27 @@
 
 This roadmap is optimized for understanding a neural network from scratch before implementing anything.
 
+## Current Repo Snapshot
+
+The current codebase already implements the first complete learning path:
+
+- a fully connected feedforward network,
+- one `Layer` per trainable transition,
+- sigmoid activation in every layer,
+- MSE loss per sample: `1/2 * sum((prediction - target)^2)`,
+- sample-wise gradient descent updates after every training example,
+- `XOR` with architecture `[2, 2, 1]`,
+- `sine approximation` with architecture `[1, 2, 1]`.
+
+That matters because some textbooks and lecture notes use other choices, for example:
+
+- `tanh` in hidden layers,
+- linear output for regression,
+- batch or mini-batch gradient descent,
+- cross-entropy for binary classification.
+
+Those are valid variants, but they are not what the current repository implements.
+
 ## Phase 1: Mathematical Minimum
 
 You should be able to explain and derive:

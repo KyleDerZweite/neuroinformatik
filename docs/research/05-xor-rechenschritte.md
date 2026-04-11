@@ -1,33 +1,78 @@
-# XOR Schritt fuer Schritt (mit LaTeX und Beispielwerten)
+# Netzwerk und Rechenschritte im aktuellen Code
 
 ## Ziel
 
-Du willst verstehen, warum ein Layer nicht nur aus zwei Vektoren bestehen kann, wenn mehrere Ausgaenge berechnet werden sollen.
+Dieses Dokument beschreibt nicht irgendeine allgemeine Lehrbuchvariante, sondern genau das,
+was der aktuelle Code in `src/neuralnet.py` und `src/simulation.py` implementiert.
 
-Beim XOR ist der Input ein Vektor mit zwei Werten:
+## Was der aktuelle Code wirklich macht
+
+Der aktuelle Stand ist:
+
+- voll verbundenes Feedforward-Netz,
+- fuer jede trainierbare Schicht ein `Layer`,
+- in jeder Schicht `sigmoid` als Aktivierung,
+- pro Sample MSE-Verlust:
 
 $$
-x = \begin{bmatrix}x_1 \\ x_2\end{bmatrix}, \quad x_1, x_2 \in \{0,1\}
+L = \frac{1}{2}\sum_k(\hat{y}_k - y_k)^2
 $$
 
-und die Zielwerte sind:
+- nach jedem einzelnen Trainingsbeispiel sofort ein Parameter-Update,
+- keine Vektorisierung, sondern bewusst ausgeschriebene Schleifen.
+
+Das ist didaktisch sinnvoll, weil jeder Rechenschritt sichtbar bleibt.
+
+## Architektur im aktuellen Repository
+
+### XOR
+
+Die XOR-Simulation verwendet:
+
+- `input = 2`
+- `hidden = 2`
+- `output = 1`
+
+Also:
 
 $$
-(0,0) \to 0,\; (0,1) \to 1,\; (1,0) \to 1,\; (1,1) \to 0
+[2, 2, 1]
 $$
 
-## Warum Gewichts-Matrix + Bias-Vektor?
+### Sinus-Approximation
 
-Fuer ein Dense-Layer mit `input_size = n` und `output_size = m` gilt fuer jedes Ausgabeneuron $j$:
+Die Sinus-Simulation verwendet aktuell:
+
+- `input = 1`
+- `hidden = 2`
+- `output = 1`
+
+Also:
+
+$$
+[1, 2, 1]
+$$
+
+Wichtig:
+
+- Auch bei der Sinus-Simulation wird aktuell `sigmoid` in allen Schichten benutzt.
+- Deshalb werden sowohl Input als auch Zielwerte auf den Bereich `[0, 1]` skaliert.
+- Der Code benutzt hier gerade **nicht** `tanh` und **nicht** einen linearen Output.
+
+## Warum Gewichts-Matrix plus Bias-Vektor?
+
+Fuer ein Dense-Layer mit `input_size = n` und `output_size = m` gilt fuer jedes Ausgabeneuron `j`:
 
 $$
 z_j = \sum_{i=1}^{n} x_i w_{ij} + b_j
 $$
 
-- Jedes Ausgabeneuron hat einen eigenen Gewichtsvektor der Laenge $n$.
-- Bei $m$ Ausgabeneuronen hast du also $m$ solcher Vektoren.
-- Diese $m$ Vektoren stapelst du zu einer Matrix $W \in \mathbb{R}^{n \times m}$.
-- Dazu kommt der Bias-Vektor $b \in \mathbb{R}^{m}$.
+Das bedeutet:
+
+- jedes Ausgabeneuron braucht einen eigenen Gewichtsvektor,
+- mehrere Ausgabeneuronen brauchen deshalb mehrere Gewichtsvektoren,
+- diese werden zu einer Matrix `W` zusammengefasst,
+- dazu kommt ein Bias pro Ausgabeneuron.
 
 Kompakt:
 
@@ -35,197 +80,175 @@ $$
 z = x^T W + b
 $$
 
-Nur ein einzelner Gewichtsvektor reicht nur fuer ein einziges Ausgabeneuron.
+Im aktuellen Code gilt:
 
-## Layer-Zaehlung kurz geklaert
+- `weights` hat Form `(input_size, output_size)`,
+- `biases` hat Form `(output_size,)`.
 
-Es gibt zwei gaengige Arten zu zaehlen:
+## Layer-Zaehlung
 
-- Neuronen-Layer: Input, Hidden, Output
-- Trainierbare Layer: nur Uebergaenge mit Gewichten
+Bei `2-2-1` gibt es:
 
-Beispiel `2-2-1`:
+- 3 Neuronen-Layer: Input, Hidden, Output
+- 2 trainierbare Layer: `2 -> 2` und `2 -> 1`
 
-- Neuronen-Layer: 3 (Input, Hidden, Output)
-- Trainierbare Layer: 2
+Die trainierbaren Parameter sind:
 
-Die beiden trainierbaren Layer sind:
-
-1. von 2 nach 2: $W^{(1)} \in \mathbb{R}^{2 \times 2}$, $b^{(1)} \in \mathbb{R}^{2}$
-2. von 2 nach 1: $W^{(2)} \in \mathbb{R}^{2 \times 1}$, $b^{(2)} \in \mathbb{R}^{1}$
-
-## XOR-Netz: 2-2-1 Architektur
-
-Wir nehmen ein kleines Netz mit:
-
-- 2 Inputs
-- 2 Hidden-Neuronen
-- 1 Output-Neuron
-- Sigmoid-Aktivierung
+1. erstes Layer:
 
 $$
-\sigma(t) = \frac{1}{1 + e^{-t}}
+W^{(1)} \in \mathbb{R}^{2 \times 2}, \quad b^{(1)} \in \mathbb{R}^{2}
 $$
 
-Beispielparameter (funktionieren fuer XOR sehr gut):
+2. zweites Layer:
 
 $$
-W^{(1)} = \begin{bmatrix}
-20 & 20 \\
-20 & 20
-\end{bmatrix},
-\quad
-b^{(1)} = \begin{bmatrix}-10 & -30\end{bmatrix}
+W^{(2)} \in \mathbb{R}^{2 \times 1}, \quad b^{(2)} \in \mathbb{R}^{1}
 $$
 
-$$
-W^{(2)} = \begin{bmatrix}20 \\ -20\end{bmatrix},
-\quad
-b^{(2)} = -10
-$$
+## Forward-Pass in genau der Form des Codes
 
-Forward-Pass:
+Fuer ein einzelnes Layer berechnet der Code:
+
+1. weighted sum plus bias:
 
 $$
-z^{(1)} = x^T W^{(1)} + b^{(1)}, \quad a^{(1)} = \sigma(z^{(1)})
+z_j = b_j + \sum_i x_i w_{ij}
 $$
 
-$$
-z^{(2)} = a^{(1)} W^{(2)} + b^{(2)}, \quad \hat{y} = \sigma(z^{(2)})
-$$
-
-## Vollstaendige Rechnung fuer Input x = (1,1)
-
-### 1) Hidden-Layer
-
-Mit $x = [1,1]^T$:
+2. Aktivierung:
 
 $$
-z^{(1)}_1 = 1 \cdot 20 + 1 \cdot 20 - 10 = 30
+a_j = \sigma(z_j) = \frac{1}{1 + e^{-z_j}}
 $$
 
-$$
-a^{(1)}_1 = \sigma(30) \approx 0.9999999999999065
-$$
+Im Code werden dabei drei Dinge gespeichert:
+
+- `last_input`
+- `last_pre_activation_values`
+- `last_output`
+
+Diese Werte werden spaeter fuer den Backward-Pass gebraucht.
+
+## XOR-Forward-Pass Schritt fuer Schritt
+
+Fuer XOR ist der Input:
 
 $$
-z^{(1)}_2 = 1 \cdot 20 + 1 \cdot 20 - 30 = 10
+x = \begin{bmatrix}x_1 \\ x_2\end{bmatrix}, \quad x_1, x_2 \in \{0,1\}
 $$
 
-$$
-a^{(1)}_2 = \sigma(10) \approx 0.9999546021312976
-$$
-
-### 2) Output-Layer
+und die Zielabbildung:
 
 $$
-z^{(2)} = 20 \cdot a^{(1)}_1 - 20 \cdot a^{(1)}_2 - 10
+(0,0) \to 0,\; (0,1) \to 1,\; (1,0) \to 1,\; (1,1) \to 0
 $$
 
+Nehmen wir ein allgemeines `2-2-1` Netzwerk.
+
+### Erstes Layer
+
+Aus dem Input `x` wird:
+
 $$
-z^{(2)} \approx 20 \cdot 0.9999999999999065 - 20 \cdot 0.9999546021312976 - 10
+z^{(1)} = x^T W^{(1)} + b^{(1)}
+$$
+
+danach:
+
+$$
+a^{(1)} = \sigma(z^{(1)})
+$$
+
+Mit Komponenten:
+
+$$
+z^{(1)}_1 = x_1 w^{(1)}_{11} + x_2 w^{(1)}_{21} + b^{(1)}_1
 $$
 
 $$
-z^{(2)} \approx -9.999092042628
+z^{(1)}_2 = x_1 w^{(1)}_{12} + x_2 w^{(1)}_{22} + b^{(1)}_2
+$$
+
+und dann:
+
+$$
+a^{(1)}_1 = \sigma(z^{(1)}_1), \quad a^{(1)}_2 = \sigma(z^{(1)}_2)
+$$
+
+### Zweites Layer
+
+Das Hidden-Layer-Output wird zum Input des naechsten Layers:
+
+$$
+z^{(2)} = a^{(1)} W^{(2)} + b^{(2)}
 $$
 
 $$
-\hat{y} = \sigma(z^{(2)}) \approx \sigma(-9.999092042628) \approx 0.0000454
+\hat{y} = a^{(2)} = \sigma(z^{(2)})
 $$
 
-Interpretation:
+Da hier nur ein Output-Neuron existiert, ist `\hat{y}` ein einzelner Wert.
 
-- Ausgabe ist sehr nahe bei 0
-- Das passt zu XOR fuer $(1,1) \to 0$
+## Verlustfunktion im aktuellen Code
 
-## Kurzer Check fuer alle 4 XOR-Inputs
-
-Mit denselben Gewichten/Biases ergibt sich ungefaehr:
-
-| Input | Erwartet | Vorhersage $\hat{y}$ |
-|---|---:|---:|
-| (0,0) | 0 | 0.000045 |
-| (0,1) | 1 | 0.999955 |
-| (1,0) | 1 | 0.999955 |
-| (1,1) | 0 | 0.000045 |
-
-## Verbindung zu deinem Code
-
-In deinem `Layer` gilt konzeptionell:
-
-- `weights` hat Form `(input_size, output_size)`
-- `biases` hat Form `(output_size,)`
-
-Bei XOR im ersten Layer also z.B.:
-
-- `input_size = 2`
-- `output_size = 2`
-- `weights` ist eine 2x2 Matrix
-- `biases` ist ein 2er Vektor
-
-Genau deshalb ist die Kombination aus Gewichts-Matrix und Bias-Vektor fuer einen allgemeinen Layer sinnvoll und notwendig.
-
-## Zweites Beispiel: Sinus-Approximation mit 1-8-1
-
-Fuer eine Regression wie $y = \sin(x)$ ist eine typische Architektur:
-
-- 1 Input
-- 8 Hidden-Neuronen
-- 1 Output
-
-Also: `1-8-1`.
-
-### Parameterformen
-
-Auch hier gibt es genau 2 trainierbare Layer:
-
-1. Hidden-Layer:
+Der Code berechnet pro Sample:
 
 $$
-W^{(1)} \in \mathbb{R}^{1 \times 8}, \quad b^{(1)} \in \mathbb{R}^{8}
+L = \frac{1}{2}(\hat{y} - y)^2
 $$
 
-2. Output-Layer:
+Bei mehreren Outputs waere es die Summe ueber alle Output-Komponenten.
+
+Der Faktor `1/2` ist nur praktisch fuer die Ableitung:
 
 $$
-W^{(2)} \in \mathbb{R}^{8 \times 1}, \quad b^{(2)} \in \mathbb{R}^{1}
+\frac{\partial L}{\partial \hat{y}} = \hat{y} - y
 $$
 
-Das sieht oft "vektorartig" aus, ist mathematisch aber weiterhin Matrixform:
+Genau damit startet der Backward-Pass im Netzwerk.
 
-$$
-W^{(1)} = \begin{bmatrix}w_1 & w_2 & \dots & w_8\end{bmatrix}
-$$
+## Trainingsschleife im aktuellen Code
 
-$$
-W^{(2)} = \begin{bmatrix}v_1 \\ v_2 \\ \vdots \\ v_8\end{bmatrix}
-$$
+Pro Epoche passiert fuer jedes Trainingssample genau dies:
 
-### Forward-Pass fuer 1-8-1
+1. `forward(sample_input)`
+2. `calculate_sample_loss(sample_target_output)`
+3. `backward(sample_target_output)`
 
-Wir behandeln den Skalar-Input als 1D-Vektor $x \in \mathbb{R}^{1}$:
+Das bedeutet:
 
-$$
-z^{(1)} = x W^{(1)} + b^{(1)} \in \mathbb{R}^{8}
-$$
+- Vorhersage berechnen
+- Fehler berechnen
+- sofort Gewichte und Biases anpassen
 
-$$
-a^{(1)} = \tanh(z^{(1)}) \in \mathbb{R}^{8}
-$$
+Das ist hier eine einfache Form von stochastischem bzw. sample-weisem Gradient Descent.
 
-$$
-z^{(2)} = a^{(1)} W^{(2)} + b^{(2)} \in \mathbb{R}^{1}
-$$
+## Sinus-Approximation im aktuellen Code
 
-$$
-\hat{y} = z^{(2)}
-$$
+Der Sinus-Teil in `src/simulation.py` macht aktuell Folgendes:
 
-Hinweis: Bei Regression wird am Output haeufig eine lineare Aktivierung verwendet (also keine Sigmoid am Ende).
+- Rohinput `x` laeuft von `0.0` bis `7.0`
+- der Input wird auf `[0,1]` normiert
+- `sin(x)` wird ebenfalls auf `[0,1]` normiert
+- das Netz hat Architektur `[1, 2, 1]`
+- auch hier wird `sigmoid` in Hidden- und Output-Layer verwendet
 
-### Warum das wichtig ist
+Darum sieht die Sinus-Dokumentation hier anders aus als in manchen Lehrbuchbeispielen fuer Regression:
 
-- Bei `1-8-1` sind es trotzdem zwei Gewichtsmatrizen.
-- Nur bei `1-1` waere die Gewichtsmatrix effektiv `1x1` (also ein einzelner Skalar).
-- Sobald mehrere Hidden-Neuronen beteiligt sind (hier 8), brauchst du mehrere Gewichte pro Uebergang.
+- kein `1-8-1`,
+- kein `tanh`,
+- kein linearer Output.
+
+## Warum das fuer das Lernen gut ist
+
+Der aktuelle Code ist klein genug, dass du fuer ein einzelnes Sample alles nachvollziehen kannst:
+
+- welche Eingaben in ein Layer gehen,
+- wie `z` entsteht,
+- wie `a` entsteht,
+- wie aus dem Fehler ein Gradient wird,
+- wie sich einzelne Gewichte veraendern.
+
+Fuer die Rueckwaertsrechnung gibt es eine eigene Schritt-fuer-Schritt-Erklaerung in
+`docs/research/06-backward-pass-visualisierung.md`.
