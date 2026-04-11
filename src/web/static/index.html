@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>Neuroinformatik Lab</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Top bar: connection + key metrics always visible -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <span class="logo">Neuro</span>
+            <span id="connection-status" class="conn-badge conn-offline">Offline</span>
+        </div>
+        <div class="topbar-stats">
+            <div class="stat">
+                <span class="stat-label">Epoch</span>
+                <strong id="status-epoch" class="stat-value">0</strong>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Sample</span>
+                <strong id="status-sample" class="stat-value">0/0</strong>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Phase</span>
+                <strong id="status-phase" class="stat-value">idle</strong>
+            </div>
+            <div class="stat stat-highlight">
+                <span class="stat-label">Loss</span>
+                <strong id="status-loss" class="stat-value">—</strong>
+            </div>
+        </div>
+    </header>
+
+    <!-- Error banner -->
+    <div id="error-banner" class="error-banner hidden" role="alert"></div>
+
+    <!-- Main layout: sidebar + content -->
+    <div class="layout">
+        <!-- Sidebar: all controls -->
+        <aside class="sidebar">
+            <!-- Config section -->
+            <section class="panel">
+                <h3 class="panel-title">Configuration</h3>
+                <div class="field">
+                    <label for="preset-select">Preset</label>
+                    <select id="preset-select">
+                        <option value="xor" selected>XOR</option>
+                        <option value="sine">Sine</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="structure-input">Structure</label>
+                    <input type="text" id="structure-input" value="2, 2, 1" placeholder="2, 2, 1">
+                </div>
+                <div class="field">
+                    <label for="lr-input">Learning rate</label>
+                    <input type="number" id="lr-input" value="1.0" step="0.01" min="0.001" max="10">
+                </div>
+                <div class="btn-row">
+                    <button id="btn-configure" class="btn btn-primary">Configure</button>
+                    <button id="btn-reset" class="btn">Reset</button>
+                </div>
+            </section>
+
+            <!-- Training section -->
+            <section class="panel">
+                <h3 class="panel-title">Training</h3>
+                <div class="field">
+                    <label for="speed-slider">Speed</label>
+                    <div class="range-row">
+                        <input type="range" id="speed-slider" min="10" max="500" value="50" step="10">
+                        <span id="speed-value" class="range-label">50 ms</span>
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button id="btn-run" class="btn btn-teal">Run</button>
+                    <button id="btn-pause" class="btn" disabled>Pause</button>
+                </div>
+            </section>
+
+            <!-- Stepping section -->
+            <section class="panel">
+                <h3 class="panel-title">Manual Steps</h3>
+                <div class="field">
+                    <label for="epoch-count">Epoch batch</label>
+                    <input type="number" id="epoch-count" value="1" min="1" max="10000" step="1">
+                </div>
+                <div class="btn-grid">
+                    <button id="btn-step-epoch" class="btn">Step Epoch</button>
+                    <button id="btn-step-forward" class="btn">Forward</button>
+                    <button id="btn-step-backward" class="btn" disabled>Backward</button>
+                    <button id="btn-layer-forward" class="btn">Layer Fwd</button>
+                    <button id="btn-layer-backward" class="btn" disabled>Layer Bwd</button>
+                </div>
+                <p id="activity-hint" class="hint">Ready for manual stepping.</p>
+            </section>
+
+            <!-- Dataset section -->
+            <section class="panel">
+                <h3 class="panel-title">Dataset</h3>
+                <p id="dataset-summary" class="hint">4 binary samples</p>
+                <div id="sample-list" class="sample-list"></div>
+            </section>
+        </aside>
+
+        <!-- Main content area -->
+        <main class="content">
+            <!-- Network visualization -->
+            <section class="viz-panel">
+                <div class="viz-header">
+                    <h2>Network</h2>
+                    <div class="viz-meta">
+                        <span id="topology-chip">—</span>
+                        <span id="learning-rate-chip">lr —</span>
+                    </div>
+                </div>
+                <canvas id="network-canvas" aria-label="Network visualization"></canvas>
+                <div class="legend">
+                    <span class="legend-item"><i class="dot dot-pos"></i>positive</span>
+                    <span class="legend-item"><i class="dot dot-neg"></i>negative</span>
+                    <span class="legend-item"><i class="dot dot-act"></i>activation</span>
+                </div>
+            </section>
+
+            <!-- Loss chart -->
+            <section class="viz-panel">
+                <div class="viz-header">
+                    <h2>Loss</h2>
+                    <div class="viz-meta">
+                        <span id="loss-length">0 epochs</span>
+                        <span id="loss-best">best —</span>
+                    </div>
+                </div>
+                <canvas id="loss-chart" aria-label="Loss curve"></canvas>
+                <p id="loss-caption" class="hint">Run training to generate a curve.</p>
+            </section>
+
+            <!-- Layer inspector -->
+            <section class="viz-panel inspector-panel">
+                <h2>Layer Inspector</h2>
+                <div id="inspector-content" class="inspector-content">
+                    <p class="empty-state">Configure a network to inspect values.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="network_graph.js"></script>
+    <script src="loss_chart.js"></script>
+    <script src="controls.js"></script>
+</body>
+</html>
