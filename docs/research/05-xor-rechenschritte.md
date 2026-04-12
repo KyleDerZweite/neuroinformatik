@@ -10,7 +10,7 @@ was der aktuelle Code in `src/neuralnet.py` und `src/simulation.py` implementier
 Der aktuelle Stand ist:
 
 - voll verbundenes Feedforward-Netz,
-- fuer jede trainierbare Schicht ein `Layer`,
+- für jede trainierbare Schicht ein `Layer`,
 - in jeder Schicht `sigmoid` als Aktivierung,
 - pro Sample MSE-Verlust:
 
@@ -61,7 +61,7 @@ Wichtig:
 
 ## Warum Gewichts-Matrix plus Bias-Vektor?
 
-Fuer ein Dense-Layer mit `input_size = n` und `output_size = m` gilt fuer jedes Ausgabeneuron `j`:
+Für ein Dense-Layer mit `input_size = n` und `output_size = m` gilt für jedes Ausgabeneuron `j`:
 
 $$
 z_j = \sum_{i=1}^{n} x_i w_{ij} + b_j
@@ -85,7 +85,7 @@ Im aktuellen Code gilt:
 - `weights` hat Form `(input_size, output_size)`,
 - `biases` hat Form `(output_size,)`.
 
-## Layer-Zaehlung
+## Layer-Zählung
 
 Bei `2-2-1` gibt es:
 
@@ -108,7 +108,7 @@ $$
 
 ## Forward-Pass in genau der Form des Codes
 
-Fuer ein einzelnes Layer berechnet der Code:
+Für ein einzelnes Layer berechnet der Code:
 
 1. weighted sum plus bias:
 
@@ -128,11 +128,11 @@ Im Code werden dabei drei Dinge gespeichert:
 - `last_pre_activation_values`
 - `last_output`
 
-Diese Werte werden spaeter fuer den Backward-Pass gebraucht.
+Diese Werte werden später für den Backward-Pass gebraucht.
 
-## XOR-Forward-Pass Schritt fuer Schritt
+## XOR-Forward-Pass Schritt für Schritt
 
-Fuer XOR ist der Input:
+Für XOR ist der Input:
 
 $$
 x = \begin{bmatrix}x_1 \\ x_2\end{bmatrix}, \quad x_1, x_2 \in \{0,1\}
@@ -178,7 +178,7 @@ $$
 
 ### Zweites Layer
 
-Das Hidden-Layer-Output wird zum Input des naechsten Layers:
+Das Hidden-Layer-Output wird zum Input des nächsten Layers:
 
 $$
 z^{(2)} = a^{(1)} W^{(2)} + b^{(2)}
@@ -198,9 +198,9 @@ $$
 L = \frac{1}{2}(\hat{y} - y)^2
 $$
 
-Bei mehreren Outputs waere es die Summe ueber alle Output-Komponenten.
+Bei mehreren Outputs wäre es die Summe über alle Output-Komponenten.
 
-Der Faktor `1/2` ist nur praktisch fuer die Ableitung:
+Der Faktor `1/2` ist nur praktisch für die Ableitung:
 
 $$
 \frac{\partial L}{\partial \hat{y}} = \hat{y} - y
@@ -210,7 +210,7 @@ Genau damit startet der Backward-Pass im Netzwerk.
 
 ## Trainingsschleife im aktuellen Code
 
-Pro Epoche passiert fuer jedes Trainingssample genau dies:
+Pro Epoche passiert für jedes Trainingssample genau dies:
 
 1. `forward(sample_input)`
 2. `calculate_sample_loss(sample_target_output)`
@@ -228,27 +228,27 @@ Das ist hier eine einfache Form von stochastischem bzw. sample-weisem Gradient D
 
 Der Sinus-Teil in `src/simulation.py` macht aktuell Folgendes:
 
-- Rohinput `x` laeuft von `0.0` bis `7.0`
+- Rohinput `x` läuft von `0.0` bis `7.0`
 - der Input wird auf `[0,1]` normiert
 - `sin(x)` wird ebenfalls auf `[0,1]` normiert
 - das Netz hat Architektur `[1, 2, 1]`
 - auch hier wird `sigmoid` in Hidden- und Output-Layer verwendet
 
-Darum sieht die Sinus-Dokumentation hier anders aus als in manchen Lehrbuchbeispielen fuer Regression:
+Darum sieht die Sinus-Dokumentation hier anders aus als in manchen Lehrbuchbeispielen für Regression:
 
 - kein `1-8-1`,
 - kein `tanh`,
 - kein linearer Output.
 
-## Warum das fuer das Lernen gut ist
+## Warum das für das Lernen gut ist
 
-Der aktuelle Code ist klein genug, dass du fuer ein einzelnes Sample alles nachvollziehen kannst:
+Der aktuelle Code ist klein genug, dass du für ein einzelnes Sample alles nachvollziehen kannst:
 
 - welche Eingaben in ein Layer gehen,
 - wie `z` entsteht,
 - wie `a` entsteht,
 - wie aus dem Fehler ein Gradient wird,
-- wie sich einzelne Gewichte veraendern.
+- wie sich einzelne Gewichte verändern.
 
-Fuer die Rueckwaertsrechnung gibt es eine eigene Schritt-fuer-Schritt-Erklaerung in
+Für die Rückwärtsrechnung gibt es eine eigene Schritt-für-Schritt-Erklärung in
 `docs/research/06-backward-pass-visualisierung.md`.

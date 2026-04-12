@@ -42,18 +42,21 @@ def run_xor_simulation():
 
 
 def build_sine_training_data():
-	"""Erzeugt Sinus-Daten fuer x von 0 bis 7 mit 100 Zwischenschritten pro 1.0."""
+	"""Erzeugt 100 Sinus-Werte für x von 0 bis 7."""
 	input_min_value = 0.0
 	input_max_value = 7.0
-	steps_between_integers = 100
+	point_count = 100
 	input_range = input_max_value - input_min_value
-	total_step_count = int(input_range * steps_between_integers)
 
 	sine_training_inputs = []
 	sine_training_targets = []
 
-	for step_index in range(total_step_count + 1):
-		raw_input_value = input_min_value + (step_index / steps_between_integers)
+	for step_index in range(point_count):
+		if point_count == 1:
+			raw_input_value = input_min_value
+		else:
+			step_fraction = step_index / (point_count - 1)
+			raw_input_value = input_min_value + (step_fraction * input_range)
 
 		# Input auf [0, 1] skalieren.
 		normalized_input_value = (raw_input_value - input_min_value) / input_range
@@ -94,14 +97,7 @@ def run_sine_simulation():
 		predicted_output_sine = (predicted_output_normalized * 2.0) - 1.0
 		expected_output_sine = math.sin(float(integer_input))
 
-		print(
-			"x=",
-			integer_input,
-			"pred=",
-			round(predicted_output_sine, 6),
-			"target=",
-			round(expected_output_sine, 6),
-		)
+		print(f"x={integer_input}, pred={round(predicted_output_sine, 6)}, target={round(expected_output_sine, 6)}")
 
 
 def main():

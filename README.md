@@ -22,45 +22,29 @@ neuroinformatik/
 ├── docs/
 │   └── research/
 └── src/
-    ├── api/
-    ├── web/
+    ├── tui/
     └── ...
 ```
 
-## Dashboard Architecture
+## TUI Architecture
 
-The dashboard is now split into two parts:
+The interactive interface now lives entirely in `src/tui/` as a Python-only
+terminal UI built with Textual.
 
-- `src/api/`: FastAPI backend exposing typed HTTP and WebSocket endpoints.
-- `src/web/`: Vite + React frontend scaffold.
-
-The neural network implementation still lives in `src/` and is used by the API layer.
+The neural network implementation still lives in `src/` and is used directly by
+the TUI controller. There is no separate API layer and no browser frontend.
 
 ## Running
 
-API:
+TUI:
 
 ```bash
-uv run uvicorn src.api.main:app --reload
-```
-
-Frontend scaffold:
-
-```bash
-cd src/web
-pnpm install
-pnpm dev
-```
-
-Both together:
-
-```bash
-uv run python scripts/dev.py
+uv run python -m src.tui
 ```
 
 ## Notes
 
 - `docs/research/` contains the planning notes, math notes, and code-aligned explanations.
-- `src/` contains the neural network implementation plus the dashboard API.
-- `src/web/` contains the frontend application scaffold.
+- `src/` contains the neural network implementation and the terminal UI.
+- `src/tui/` contains the Textual app and the session controller.
 - The current implementation uses a small feedforward network with manual forward pass, manual backpropagation, sigmoid activations, and MSE loss.

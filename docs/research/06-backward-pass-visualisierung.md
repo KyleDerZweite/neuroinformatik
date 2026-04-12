@@ -1,8 +1,8 @@
-# Backward Pass Schritt fuer Schritt
+# Backward Pass Schritt für Schritt
 
 ## Ziel
 
-Dieses Dokument erklaert die Rueckwaertspropagation exakt so, wie sie im aktuellen
+Dieses Dokument erklärt die Rückwärtspropagation exakt so, wie sie im aktuellen
 Code in `src/neuralnet.py` umgesetzt ist.
 
 ## Die Idee in einem Satz
@@ -18,9 +18,9 @@ Pro `Layer` werden nach `forward(...)` diese Werte gespeichert:
 - `last_pre_activation_values`
 - `last_output`
 
-Das ist noetig, weil der Backward-Pass genau diese Werte fuer die Ableitungen braucht.
+Das ist nötig, weil der Backward-Pass genau diese Werte für die Ableitungen braucht.
 
-## Gesamtbild fuer ein `2-2-1` Netzwerk
+## Gesamtbild für ein `2-2-1` Netzwerk
 
 ```text
 Forward:
@@ -54,7 +54,7 @@ Output-Layer:
   local gradient = (gradient from next layer) * sigmoid'(output)
   |
   v
-gradient fuer Hidden-Layer berechnen
+Gradient für Hidden-Layer berechnen
   |
   v
 Hidden-Layer:
@@ -72,7 +72,7 @@ $$
 \frac{\partial L}{\partial \hat{y}} = \hat{y} - y
 $$
 
-Bei mehreren Outputs passiert das fuer jede Output-Komponente getrennt.
+Bei mehreren Outputs passiert das für jede Output-Komponente getrennt.
 
 Im Code heisst dieser Vektor:
 
@@ -91,7 +91,7 @@ $$
 g_j
 $$
 
-Im Output-Layer ist das zunaechst:
+Im Output-Layer ist das zunächst:
 
 $$
 g_j = \frac{\partial L}{\partial a_j}
@@ -115,11 +115,11 @@ Im Code heisst dieser Vektor:
 
 Anschaulich:
 
-- `g_j` sagt: "Wie empfindlich ist der Fehler gegenueber dem Layer-Output?"
-- `a_j(1-a_j)` sagt: "Wie stark aendert sich der Layer-Output, wenn sich die weighted sum aendert?"
-- das Produkt gibt: "Wie empfindlich ist der Fehler gegenueber der weighted sum?"
+- `g_j` sagt: "Wie empfindlich ist der Fehler gegenüber dem Layer-Output?"
+- `a_j(1-a_j)` sagt: "Wie stark ändert sich der Layer-Output, wenn sich die weighted sum ändert?"
+- das Produkt gibt: "Wie empfindlich ist der Fehler gegenüber der weighted sum?"
 
-## Mini-Visualisierung fuer ein einzelnes Ausgabeneuron
+## Mini-Visualisierung für ein einzelnes Ausgabeneuron
 
 ```text
 input_i --( * w_ij )--> contribution ----+
@@ -129,7 +129,7 @@ other inputs ----------------------------+--> z_j --> sigmoid --> a_j --> Loss
 bias b_j --------------------------------+
 ```
 
-Rueckwaerts:
+Rückwärts:
 
 ```text
 Loss --> dL/da_j --> dL/dz_j = dL/da_j * sigmoid'(z_j)
@@ -141,11 +141,11 @@ Loss --> dL/da_j --> dL/dz_j = dL/da_j * sigmoid'(z_j)
                      +--> Beitrag zum vorherigen Layer
 ```
 
-## Schritt 3: Gradient fuer das vorherige Layer berechnen
+## Schritt 3: Gradient für das vorherige Layer berechnen
 
-Damit ein frueheres Layer lernen kann, muss der Fehler weiter nach links propagiert werden.
+Damit ein früheres Layer lernen kann, muss der Fehler weiter nach links propagiert werden.
 
-Fuer jedes Input-Neuron `i` des aktuellen Layers berechnet der Code:
+Für jedes Input-Neuron `i` des aktuellen Layers berechnet der Code:
 
 $$
 gradient\_for\_previous\_layer_i = \sum_j \delta_j w_{ij}
@@ -154,7 +154,7 @@ $$
 Das bedeutet:
 
 - jedes Input-Neuron des aktuellen Layers beeinflusst mehrere Ausgabeneuronen,
-- deshalb werden die Beitraege aller Ausgabeneuronen aufsummiert.
+- deshalb werden die Beiträge aller Ausgabeneuronen aufsummiert.
 
 Im Code heisst das Ergebnis:
 
@@ -163,11 +163,11 @@ Im Code heisst das Ergebnis:
 Wichtig:
 
 - Dieser Schritt passiert **vor** dem Update der Gewichte.
-- Der Gradient wird also mit den aktuell noch gueltigen Gewichten propagiert.
+- Der Gradient wird also mit den aktuell noch gültigen Gewichten propagiert.
 
 ## Schritt 4: Bias-Gradient und Bias-Update
 
-Fuer den Bias eines Ausgabeneurons gilt:
+Für den Bias eines Ausgabeneurons gilt:
 
 $$
 z_j = \sum_i x_i w_{ij} + b_j
@@ -195,7 +195,7 @@ mit Lernrate `\eta`.
 
 ## Schritt 5: Gewichtsgradient und Gewichtsupdate
 
-Fuer ein Gewicht `w_ij` gilt:
+Für ein Gewicht `w_ij` gilt:
 
 $$
 z_j = \sum_i x_i w_{ij} + b_j
@@ -237,17 +237,17 @@ In exakt derselben Reihenfolge wie im Code:
 
 1. Gradient von rechts empfangen
 2. mit `sigmoid`-Ableitung zum lokalen Gradient machen
-3. Gradient fuer das vorherige Layer berechnen
+3. Gradient für das vorherige Layer berechnen
 4. Biases updaten
 5. Gewichte updaten
-6. Gradient fuer das vorherige Layer zurueckgeben
+6. Gradient für das vorherige Layer zurückgeben
 
 ## Schritt 7: Auf das ganze Netzwerk angewandt
 
-Bei einem `2-2-1` Netz laeuft die Rueckwaertsrechnung so:
+Bei einem `2-2-1` Netz läuft die Rückwärtsrechnung so:
 
 ```text
-1. Forward-Pass fuer ein Sample
+1. Forward-Pass für ein Sample
    x -> hidden activations -> output prediction
 
 2. Loss berechnen
@@ -257,20 +257,20 @@ Bei einem `2-2-1` Netz laeuft die Rueckwaertsrechnung so:
    start gradient = y_hat - y
    -> lokalen Gradient berechnen
    -> W^(2) und b^(2) updaten
-   -> Gradient fuer Hidden-Layer erzeugen
+  -> Gradient für Hidden-Layer erzeugen
 
 4. Hidden-Layer backward
    empfangenen Gradient nehmen
    -> lokalen Gradient berechnen
    -> W^(1) und b^(1) updaten
-   -> Gradient fuer Input-Seite erzeugen
+  -> Gradient für Input-Seite erzeugen
 ```
 
 Danach ist das Sample komplett verarbeitet.
 
-## Warum der Code `last_output` statt `last_pre_activation_values` fuer sigmoid benutzt
+## Warum der Code `last_output` statt `last_pre_activation_values` für sigmoid benutzt
 
-Fuer `sigmoid` gilt:
+Für `sigmoid` gilt:
 
 $$
 \sigma'(z) = \sigma(z)(1-\sigma(z))
@@ -282,22 +282,22 @@ $$
 \sigma'(z) = a(1-a)
 $$
 
-Darum braucht der Code fuer die Aktivierungsableitung nicht nochmal explizit `z`.
+Darum braucht der Code für die Aktivierungsableitung nicht nochmal explizit `z`.
 
-`last_pre_activation_values` wird trotzdem gespeichert, weil es fuer Debugging und spaetere Erweiterungen hilfreich ist.
+`last_pre_activation_values` wird trotzdem gespeichert, weil es für Debugging und spätere Erweiterungen hilfreich ist.
 
-## Was wirklich rueckwaerts fliesst
+## Was wirklich rückwärts fließt
 
-Rueckwaerts fliessen nicht die originalen Inputs und auch nicht die Targets.
-Rueckwaerts fliessen Gradienten, also Sensitivitaeten des Fehlers:
+Rückwärts fließen nicht die originalen Inputs und auch nicht die Targets.
+Rückwärts fließen Gradienten, also Sensitivitäten des Fehlers:
 
-- "Wenn sich dieser Wert leicht aendert, wie stark aendert sich dann der Gesamtfehler?"
+- "Wenn sich dieser Wert leicht ändert, wie stark ändert sich dann der Gesamtfehler?"
 
 Das ist die Kernidee von Backpropagation.
 
-## Hauefige Denkfehler
+## Häufige Denkfehler
 
-- Es wird nicht der Fehlerwert selbst rueckwaerts kopiert, sondern seine Ableitungsinformation.
+- Es wird nicht der Fehlerwert selbst rückwärts kopiert, sondern seine Ableitungsinformation.
 - Der Gewichtsgradient ist nicht einfach `prediction - target`.
 - Ohne gespeicherte Zwischenwerte aus dem Forward-Pass kann der Layer seinen lokalen Gradient nicht korrekt berechnen.
-- Ein Layer muss den Gradient erst fuer das vorherige Layer berechnen und danach die eigenen Parameter updaten.
+- Ein Layer muss den Gradient erst für das vorherige Layer berechnen und danach die eigenen Parameter updaten.

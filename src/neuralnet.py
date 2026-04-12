@@ -35,7 +35,7 @@ class Layer:
         return sigmoid_output * (1.0 - sigmoid_output)
 
     def forward(self, input_data):
-        """Rechnet den Vorwärtsschritt fuer diese Layer."""
+        """Rechnet den Vorwärtsschritt für diesen Layer."""
         if len(input_data) != self.input_size:
             raise ValueError("input_data has wrong size for this layer")
 
@@ -59,7 +59,7 @@ class Layer:
         return self.last_output
 
     def backward(self, gradient_from_next_layer):
-        """Rechnet den Rueckwärtsschritt und aktualisiert Gewichte/Biases."""
+        """Rechnet den Rückwärtsschritt und aktualisiert Gewichte/Biases."""
         if len(gradient_from_next_layer) != self.output_size:
             raise ValueError("gradient_from_next_layer has wrong size for this layer")
         if self.last_input is None or self.last_output is None:
@@ -96,7 +96,7 @@ class Layer:
 
 class NeuralNetwork:
     def __init__(self, structure: list[int], learning_rate: float = 0.1):
-        """Erstellt ein Netzwerk aus Layer-Groessen, z.B. [2, 2, 1]."""
+        """Erstellt ein Netzwerk aus Layer-Größen, z.B. [2, 2, 1]."""
         if len(structure) < 2:
             raise ValueError("structure needs at least input and output size")
 
