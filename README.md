@@ -22,18 +22,45 @@ neuroinformatik/
 ├── docs/
 │   └── research/
 └── src/
+    ├── api/
     ├── web/
     └── ...
 ```
 
-## Web
+## Dashboard Architecture
 
-The repository includes a small web dashboard in `src/web/` for interacting with the network in the browser.
-It serves static files and a WebSocket endpoint from the same port.
+The dashboard is now split into two parts:
+
+- `src/api/`: FastAPI backend exposing typed HTTP and WebSocket endpoints.
+- `src/web/`: Vite + React frontend scaffold.
+
+The neural network implementation still lives in `src/` and is used by the API layer.
+
+## Running
+
+API:
+
+```bash
+uv run uvicorn src.api.main:app --reload
+```
+
+Frontend scaffold:
+
+```bash
+cd src/web
+pnpm install
+pnpm dev
+```
+
+Both together:
+
+```bash
+uv run python scripts/dev.py
+```
 
 ## Notes
 
 - `docs/research/` contains the planning notes, math notes, and code-aligned explanations.
-- `src/` contains the current implementation.
-- `src/web/` contains the browser-based UI and server entry point.
+- `src/` contains the neural network implementation plus the dashboard API.
+- `src/web/` contains the frontend application scaffold.
 - The current implementation uses a small feedforward network with manual forward pass, manual backpropagation, sigmoid activations, and MSE loss.

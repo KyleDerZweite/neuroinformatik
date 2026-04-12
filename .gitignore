@@ -2,3 +2,8 @@ docs/vorlesung-folien/
 __pycache__/
 *.pyc
 *.pyo
+.pytest_cache/
+.venv/
+dist/
+node_modules/
+*.egg-info/
