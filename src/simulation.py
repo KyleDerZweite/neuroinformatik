@@ -1,9 +1,7 @@
 import math
 
-try:
-	from neuralnet import NeuralNetwork
-except ModuleNotFoundError:
-	from src.neuralnet import NeuralNetwork
+from neuralnet import NeuralNetwork
+from matrix import print_matrix
 
 def run_xor_simulation():
 	print("\n=== XOR simulation ===")

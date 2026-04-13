@@ -42,3 +42,7 @@ def dot(a: MATRIX, b: MATRIX) -> MATRIX:
             for k in range(len(b)):
                 result[i][j] += a[i][k] * b[k][j]
     return result
+
+def print_matrix(matrix: MATRIX) -> None:
+    for row in matrix:
+        print(" ".join(f"{value}" for value in row))

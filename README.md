@@ -26,14 +26,6 @@ neuroinformatik/
     └── ...
 ```
 
-## TUI Architecture
-
-The interactive interface now lives entirely in `src/tui/` as a Python-only
-terminal UI built with Textual.
-
-The neural network implementation still lives in `src/` and is used directly by
-the TUI controller. There is no separate API layer and no browser frontend.
-
 ## Running
 
 TUI:
