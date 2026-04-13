@@ -10,6 +10,9 @@ def create_weight_matrix(rows: int, cols: int) -> MATRIX:
 
     Glorot, X., & Bengio, Y. (2010). Understanding the difficulty of training deep feedforward neural networks 
     - https://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf
+    
+    Tbh, kein plan, passt und hinterfrag ich nicht weiter. 
+    Ich weiß nicht wie es hilft, aber es soll helfen das die werte nicht zu klein oder groß werden. 
     """
     limit = math.sqrt(6 / (rows + cols))
     return [[random.uniform(-limit, limit) for _ in range(cols)] for _ in range(rows)]

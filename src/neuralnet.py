@@ -61,7 +61,9 @@ class Layer:
         local_gradient_per_output = []
         for output_neuron_index in range(self.output_size):
             output_value = self.last_output[output_neuron_index]
+            # Sigmoid-Ableitung bestimmt wie stark das Neuron für den Fehler verantwortlich ist
             sigmoid_derivative = self._sigmoid_derivative_from_output(output_value)
+            # Gradient-Value ist der dann tatsächliche Fehlerwert, der zurückpropagiert wird
             gradient_value = gradient_from_next_layer[output_neuron_index] * sigmoid_derivative
             local_gradient_per_output.append(gradient_value)
 
@@ -120,10 +122,17 @@ class NeuralNetwork:
         for output_value_index in range(len(last_output)):
             predicted_output_value = last_output[output_value_index]
             expected_output_value = target_output[output_value_index]
+            # Gibt die Richtung des Fehlers an, also ob wir über oder unter dem Ziel liegen.
             output_gradient_value = predicted_output_value - expected_output_value
             current_gradient_vector.append(output_gradient_value)
 
-        # rueckwärts durch alle layer
+        # I mean, wir haben nur einen output, aber so sollten wir mehrere abfangen können. 
+        # TODO: testen, mit mehreren outputs
+        # if (len(current_gradient_vector) > 1):
+        #     print("current_gradient_vector", current_gradient_vector)
+        # ist hier aktuell immer len() = 1
+
+        # rückwärts durch alle layer
         for layer in reversed(self.layers):
             current_gradient_vector = layer.backward(current_gradient_vector)
 
@@ -150,12 +159,7 @@ class NeuralNetwork:
         fail_safe_max_epochs=100000,
         report_every_epochs=0,
     ):
-        """Trainiert bis target_loss erreicht ist oder fail-safe greift.
-
-        Gibt die durchschnittlichen Verluste pro Epoche zurueck. Wenn der
-        fail-safe zuerst greift, endet das Training einfach nach
-        fail_safe_max_epochs.
-        """
+        """Trainiert bis target_loss erreicht ist oder fail-safe greift."""
         epoch_losses = []
         # jede epoche alle trainingsdaten durchgehen
         for epoch_number in range(1, fail_safe_max_epochs + 1):

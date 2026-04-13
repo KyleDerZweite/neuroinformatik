@@ -1,7 +1,7 @@
 import math
 
 from neuralnet import NeuralNetwork
-from matrix import print_matrix
+from matrix import create_weight_matrix, print_matrix
 
 def run_xor_simulation():
 	print("\n=== XOR simulation ===")
@@ -19,7 +19,7 @@ def run_xor_simulation():
 		[0.0],
 	]
 
-	xor_network = NeuralNetwork([2, 2, 1], learning_rate=1)
+	xor_network = NeuralNetwork([2, 2, 1], learning_rate=0.7)
 	xor_target_loss = 0.0001
 	xor_report_every_epochs = 500
 	xor_epoch_losses = xor_network.train(
@@ -77,7 +77,7 @@ def run_sine_simulation():
 	target_loss = 0.0001
 	report_every_epochs = 500
 
-	sine_network = NeuralNetwork([1, 2, 1], learning_rate=0.275)
+	sine_network = NeuralNetwork([1, 8, 1], learning_rate=0.5)
 	sine_epoch_losses = sine_network.train(
 		sine_training_inputs,
 		sine_training_targets,
