@@ -67,23 +67,27 @@ class Layer:
             gradient_value = gradient_from_next_layer[output_neuron_index] * sigmoid_derivative
             local_gradient_per_output.append(gradient_value)
 
-        # gradient für das vorherige layer
+        # Gradient für das vorherige Layer sammeln
         gradient_for_previous_layer = []
         for input_neuron_index in range(self.input_size):
+            # Für jedes Eingabe-Neuron zählen wir zusammen, wie stark es den Fehler aus der aktuellen Schicht mitträgt
             propagated_gradient_sum = 0.0
             for output_neuron_index in range(self.output_size):
                 current_weight = self.weights[input_neuron_index][output_neuron_index]
+                # Jedes Gewicht gibt einen Teil des Fehlers weiter
                 propagated_gradient_sum += local_gradient_per_output[output_neuron_index] * current_weight
+            # Ein Gradient-Wert pro Eingabe-Neuron
             gradient_for_previous_layer.append(propagated_gradient_sum)
 
-        # bias anpassen
+        # Der Bias verschiebt das Neuron direkt, ohne dass ein Eingabewert nötig ist.
         for output_neuron_index in range(self.output_size):
             self.biases[output_neuron_index] -= self.learning_rate * local_gradient_per_output[output_neuron_index]
 
-        # gewichte anpassen
+        # Jedes Gewicht verbindet ein Eingabe-Neuron mit einem Ausgabe-Neuron.
         for input_neuron_index in range(self.input_size):
             input_value = self.last_input[input_neuron_index]
             for output_neuron_index in range(self.output_size):
+                # Wenn das Eingabe-Signal groß ist, wirkt der Gradient stärker auf das Gewicht.
                 weight_gradient = input_value * local_gradient_per_output[output_neuron_index]
                 self.weights[input_neuron_index][output_neuron_index] -= self.learning_rate * weight_gradient
 
